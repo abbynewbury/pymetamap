@@ -205,7 +205,7 @@ class SubprocessBackend(MetaMap):
                 if sys.version_info[0] > 2:
                     if isinstance(output, bytes):
                         output = output.decode()
-
+                        print(output)
                 # "Processing" sentences are returned as stderr. Hence success/failure of metamap_process needs to be
                 #  checked by its returncode.
                 if metamap_process.returncode == 0:
@@ -243,6 +243,8 @@ class SubprocessBackend(MetaMap):
                         metamap_process.terminate()
                         error = stdout.rstrip()
                 output = str(output_file.read())
+                print('---')
+                print(output)
         finally:
             if sentences is not None:
                 # os.remove(input_file.name)
