@@ -232,7 +232,7 @@ class SubprocessBackend(MetaMap):
                         output = output[prev_new_line + 1:]
                     else: # file type is xml
                         print(output)
-                        output = xml_parser.fromstring(output)
+                        output = xml_parser.fromstring(str(output))
 
                 else:
                     error = "ERROR: MetaMap failed"
