@@ -53,7 +53,7 @@ class SubprocessBackend(MetaMap):
                          restrict_to_sts=[],
                          exclude_sts=[],
                          no_nums=[],
-                         number_the_mappings=False):
+                         file_type = 'mmi'):
         """ extract_concepts takes a list of sentences and ids(optional)
             then returns a list of Concept objects extracted via
             MetaMap.
@@ -107,7 +107,15 @@ class SubprocessBackend(MetaMap):
         try:
             command = list()
             command.append(self.metamap_filename)
-            command.append('-N')
+            # for the mmi file
+            if file_type == 'mmi':
+                command.append('-N')
+            # for the XML file
+            elif file_type == 'xml':
+                command.append('--XMLf')
+            else:
+                print('ERROR: please enter mmi or xml file')
+                break
             command.append('-Q')
             command.append(str(composite_phrase))
             if mm_data_version is not False:
@@ -122,9 +130,6 @@ class SubprocessBackend(MetaMap):
             if prune is not False:
                 command.append('--prune')
                 command.append(str(prune))
-            # added by me
-            if number_the_mappings is not False:
-                command.append('-f')
             if relaxed_model:
                 command.append('-C')
             if allow_large_n:
