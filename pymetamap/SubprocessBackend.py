@@ -52,7 +52,8 @@ class SubprocessBackend(MetaMap):
                          restrict_to_sources=[],
                          restrict_to_sts=[],
                          exclude_sts=[],
-                         no_nums=[]):
+                         no_nums=[],
+                         number_the_mappings=False):
         """ extract_concepts takes a list of sentences and ids(optional)
             then returns a list of Concept objects extracted via
             MetaMap.
@@ -80,6 +81,8 @@ class SubprocessBackend(MetaMap):
                 Restrict to Semantic Types -J
                 Exclude Semantic Types -k
                 Suppress Numerical Concepts --no_nums
+                added by me:
+                Number the mappings (if equivalent) -f
 
 
             For information about the available options visit
@@ -119,6 +122,9 @@ class SubprocessBackend(MetaMap):
             if prune is not False:
                 command.append('--prune')
                 command.append(str(prune))
+            # added by me
+            if number_the_mappings is not False:
+                command.append('-f')
             if relaxed_model:
                 command.append('-C')
             if allow_large_n:
