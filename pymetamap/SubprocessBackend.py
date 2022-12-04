@@ -114,8 +114,8 @@ class SubprocessBackend(MetaMap):
             elif file_type == 'xml':
                 command.append('--XMLf')
             else:
-                print('ERROR: please enter mmi or xml file')
-                break
+                print('ERROR: please enter mmi or xml file - using default mmi')
+                command.append('-N')
             command.append('-Q')
             command.append(str(composite_phrase))
             if mm_data_version is not False:
