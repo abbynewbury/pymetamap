@@ -16,6 +16,8 @@ import sys
 import tempfile
 from .MetaMap import MetaMap
 from .Concept import Corpus
+import xml.etree.ElementTree as xml_parser
+
 
 
 class SubprocessBackend(MetaMap):
@@ -205,28 +207,32 @@ class SubprocessBackend(MetaMap):
                 if sys.version_info[0] > 2:
                     if isinstance(output, bytes):
                         output = output.decode()
-                        print(output)
                 # "Processing" sentences are returned as stderr. Hence success/failure of metamap_process needs to be
                 #  checked by its returncode.
                 if metamap_process.returncode == 0:
                     # Initial line(s) of output contains MetaMap command and MetaMap details.
                     # Even on using --silent option, MetaMap command is sent to stdout.
                     # Hence pre-processing is required to segregate these from MetaMap output in stdout.
-                    prev_new_line = -1
-                    while (prev_new_line + 1) < len(output):
-                        next_new_line = output.find('\n', prev_new_line + 1)
-                        if next_new_line < 0:
-                            next_new_line = len(output)
-                        # Check if the current line is in MMI output format i.e. fields separated by '|'
-                        fields = output[prev_new_line + 1:next_new_line].split('|')
-                        # https://metamap.nlm.nih.gov/Docs/MMI_Output_2016.pdf
-                        #   This document explains the various fields in MMI output.
-                        if len(fields) > 1 and fields[1] in ['MMI', 'AA', 'UA']:
-                            break
-                        else:
-                            prev_new_line = next_new_line
+                    # for mmi files
+                    if file_type == 'mmi':
+                        prev_new_line = -1
+                        while (prev_new_line + 1) < len(output):
+                            next_new_line = output.find('\n', prev_new_line + 1)
+                            if next_new_line < 0:
+                                next_new_line = len(output)
+                            # Check if the current line is in MMI output format i.e. fields separated by '|'
+                            fields = output[prev_new_line + 1:next_new_line].split('|')
+                            # https://metamap.nlm.nih.gov/Docs/MMI_Output_2016.pdf
+                            #   This document explains the various fields in MMI output.
+                            if len(fields) > 1 and fields[1] in ['MMI', 'AA', 'UA']:
+                                break
+                            else:
+                                prev_new_line = next_new_line
 
-                    output = output[prev_new_line + 1:]
+                        output = output[prev_new_line + 1:]
+                    else: # file type is xml
+                        output = xml_parser.fromstring(xml_output)
+
                 else:
                     error = "ERROR: MetaMap failed"
             else:
@@ -243,8 +249,6 @@ class SubprocessBackend(MetaMap):
                         metamap_process.terminate()
                         error = stdout.rstrip()
                 output = str(output_file.read())
-                print('---')
-                print(output)
         finally:
             if sentences is not None:
                 # os.remove(input_file.name)
@@ -252,6 +256,8 @@ class SubprocessBackend(MetaMap):
             else:
                 input_file.close()
                 os.remove(output_file.name)
-
-        concepts = Corpus.load(output.splitlines())
+        if file_type == 'mmi':
+            concepts = Corpus.load(output.splitlines())
+        else: # outputting xml file
+            concepts = output
         return (concepts, error)
