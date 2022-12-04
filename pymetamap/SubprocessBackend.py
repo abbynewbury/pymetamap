@@ -232,6 +232,7 @@ class SubprocessBackend(MetaMap):
                         output = output[prev_new_line + 1:]
                     else: # file type is xml
                         string_output = str(output)
+                        print(string_output)
                         output = xml_parser.fromstring(string_output)
 
                 else:
