@@ -232,8 +232,8 @@ class SubprocessBackend(MetaMap):
                         output = output[prev_new_line + 1:]
                     else: # file type is xml
                         string_output = str(output)
-                        print('below is the string output:')
-                        print(string_output)
+                        # removing the input_command - starting where xml starts
+                        string_output[string_output.find('<'):]
                         output = xml_parser.fromstring(string_output)
 
                 else:
